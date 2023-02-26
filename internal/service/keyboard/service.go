@@ -15,19 +15,9 @@ func NewService() *Service {
 			tgbotapi.NewKeyboardButtonRow(
 				tgbotapi.NewKeyboardButton("Список"),
 			),
-			tgbotapi.NewKeyboardButtonRow(
-				tgbotapi.NewKeyboardButton("Добавить"),
-				tgbotapi.NewKeyboardButton("Изменить"),
-				tgbotapi.NewKeyboardButton("Удалить"),
-				tgbotapi.NewKeyboardButton("Помощь"),
-			),
 		),
 		commands: map[string]string{
-			"Список":   "list",
-			"Добавить": "add",
-			"Изменить": "change",
-			"Удалить":  "delete",
-			"Помощь":   "help",
+			"Список": "list",
 		},
 	}
 }
