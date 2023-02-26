@@ -1,4 +1,4 @@
-module github.com/sadbard/bot
+module github.com/sadbard/StorageBot
 
 go 1.18
 

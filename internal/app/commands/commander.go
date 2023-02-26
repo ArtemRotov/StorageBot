@@ -4,18 +4,18 @@ import (
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sadbard/bot/internal/service/product"
+	"github.com/sadbard/StorageBot/internal/service/keyboard"
 )
 
 type Commander struct {
-	bot            *tgbotapi.BotAPI
-	productService *product.Service
+	bot             *tgbotapi.BotAPI
+	keyboardService *keyboard.Service
 }
 
-func NewCommander(bot *tgbotapi.BotAPI, prSrvc *product.Service) *Commander {
+func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service) *Commander {
 	return &Commander{
-		bot:            bot,
-		productService: prSrvc,
+		bot:             bot,
+		keyboardService: keybServ,
 	}
 }
 
@@ -26,22 +26,26 @@ func (c *Commander) HandleUpdate(update *tgbotapi.Update) {
 		}
 	}()
 
-	if update.CallbackQuery != nil {
-		msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID,
-			"Data: "+update.CallbackQuery.Data)
-		c.bot.Send(msg)
-		return
-	}
-
 	if update.Message != nil { // If we got a message
 
-		switch update.Message.Command() {
+		command := update.Message.Command()
+		if len(command) == 0 {
+			command = c.keyboardService.Сommand(update.Message.Text)
+		}
+
+		switch command {
+		case "start":
+			c.Start(update.Message)
 		case "help":
 			c.Help(update.Message)
 		case "list":
 			c.List(update.Message)
-		case "get":
-			c.Get(update.Message)
+		case "add":
+			c.Add(update.Message)
+		case "change":
+			c.Change(update.Message)
+		case "delete":
+			c.Delete(update.Message)
 		default:
 			c.Default(update.Message)
 		}

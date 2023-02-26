@@ -6,8 +6,21 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
-	"github.com/sadbard/bot/internal/app/commands"
-	"github.com/sadbard/bot/internal/service/product"
+	"github.com/sadbard/StorageBot/internal/app/commands"
+	"github.com/sadbard/StorageBot/internal/service/keyboard"
+)
+
+var numericKeyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("1"),
+		tgbotapi.NewKeyboardButton("2"),
+		tgbotapi.NewKeyboardButton("3"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("4"),
+		tgbotapi.NewKeyboardButton("5"),
+		tgbotapi.NewKeyboardButton("6"),
+	),
 )
 
 func main() {
@@ -27,8 +40,8 @@ func main() {
 		Timeout: 60,
 	}
 
-	productService := product.NewService()
-	commander := commands.NewCommander(bot, productService)
+	keyboardService := keyboard.NewService()
+	commander := commands.NewCommander(bot, keyboardService)
 
 	updates := bot.GetUpdatesChan(u)
 

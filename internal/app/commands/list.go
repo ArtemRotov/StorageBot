@@ -5,21 +5,6 @@ import (
 )
 
 func (c *Commander) List(inputMsg *tgbotapi.Message) {
-	outputText := "Here all the products: \n\n"
-
-	products := c.productService.List()
-	for _, val := range products {
-		outputText += val.Title
-		outputText += "\n"
-	}
-
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, outputText)
-
-	msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("NextPage", "some data"),
-		),
-	)
-
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "TBD LIST")
 	c.bot.Send(msg)
 }
