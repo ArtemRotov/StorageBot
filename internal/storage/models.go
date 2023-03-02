@@ -6,22 +6,28 @@ import (
 )
 
 type RecordInterface interface {
-	All() ([]Record, error)
+	All(userID int64) ([]Record, error)
 }
 
 type Record struct {
-	UserID int
-	Name   string
-	Login  string
-	Passw  string
+	ID    int
+	Name  string
+	Login string
+	Passw string
 }
 
 type RecordDB struct {
 	DB *sql.DB
 }
 
-func (r *RecordDB) All() ([]Record, error) {
-	rows, err := r.DB.Query("SELECT * FROM records")
+func (r *RecordDB) All(userID int64) ([]Record, error) {
+	rows, err := r.DB.Query(
+		`
+		SELECT R.record_id, R.name, R.login, R.password 
+		FROM records R
+		WHERE R.user_id = $1
+		`, userID)
+
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +38,7 @@ func (r *RecordDB) All() ([]Record, error) {
 
 	for rows.Next() {
 		var rec Record
-		err := rows.Scan(&rec.UserID, &rec.Name, &rec.Login, &rec.Passw)
+		err := rows.Scan(&rec.ID, &rec.Name, &rec.Login, &rec.Passw)
 		if err != nil {
 			return nil, err
 		}
@@ -47,5 +53,5 @@ func (r *RecordDB) All() ([]Record, error) {
 }
 
 func (r *Record) String() string {
-	return fmt.Sprintf("%d   %s   %s   %s\n", r.UserID, r.Name, r.Login, r.Passw)
+	return fmt.Sprintf("%d   %s   %s   %s\n\n", r.ID, r.Name, r.Login, r.Passw)
 }

@@ -1,21 +1,25 @@
 package commands
 
 import (
+	"database/sql"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
+	"github.com/sadbard/StorageBot/internal/storage"
 )
 
 type Commander struct {
 	bot             *tgbotapi.BotAPI
 	keyboardService *keyboard.Service
+	recordDB        storage.RecordInterface
 }
 
-func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service) *Commander {
+func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service, db *sql.DB) *Commander {
 	return &Commander{
 		bot:             bot,
 		keyboardService: keybServ,
+		recordDB:        &storage.RecordDB{DB: db},
 	}
 }
 

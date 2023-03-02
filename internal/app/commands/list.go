@@ -1,27 +1,23 @@
 package commands
 
 import (
-	"database/sql"
 	"log"
-	"time"
+	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/sadbard/StorageBot/internal/storage"
 )
 
 func (c *Commander) List(inputMsg *tgbotapi.Message) {
-	start := time.Now()
 
-	db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
+	records, err := c.recordDB.All(inputMsg.From.ID)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
+	}
+	strOut := strings.Builder{}
+	for _, rec := range records {
+		strOut.WriteString(rec.String())
 	}
 
-	recs := storage.RecordDB{}
-
-	duration := time.Since(start).String()
-
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "TBD LIST")
-
+	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, strOut.String())
 	c.bot.Send(msg)
 }
