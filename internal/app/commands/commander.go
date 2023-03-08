@@ -1,25 +1,29 @@
 package commands
 
 import (
-	"database/sql"
+	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
-	"github.com/sadbard/StorageBot/internal/storage"
 )
 
-type Commander struct {
-	bot             *tgbotapi.BotAPI
-	keyboardService *keyboard.Service
-	recordDB        storage.RecordInterface
+type RecordInterface interface {
+	All(userId int64) ([]fmt.Stringer, error)
+	Add(userId int64, label, login, password string) error
 }
 
-func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service, db *sql.DB) *Commander {
+type Commander struct {
+	bot              *tgbotapi.BotAPI
+	keyboardService  *keyboard.Service
+	dataAccessObject RecordInterface
+}
+
+func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service, dao RecordInterface) *Commander {
 	return &Commander{
-		bot:             bot,
-		keyboardService: keybServ,
-		recordDB:        &storage.RecordDB{DB: db},
+		bot:              bot,
+		keyboardService:  keybServ,
+		dataAccessObject: dao,
 	}
 }
 

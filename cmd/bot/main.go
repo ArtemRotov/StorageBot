@@ -11,6 +11,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/sadbard/StorageBot/internal/app/commands"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
+	"github.com/sadbard/StorageBot/internal/storage"
 )
 
 var numericKeyboard = tgbotapi.NewReplyKeyboard(
@@ -55,8 +56,9 @@ func main() {
 	}
 	defer db.Close()
 
+	recDB := storage.NewRecordDB(db)
 	keyboardService := keyboard.NewService()
-	commander := commands.NewCommander(bot, keyboardService, db)
+	commander := commands.NewCommander(bot, keyboardService, recDB)
 
 	updates := bot.GetUpdatesChan(u)
 

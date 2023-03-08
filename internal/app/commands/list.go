@@ -9,7 +9,7 @@ import (
 
 func (c *Commander) List(inputMsg *tgbotapi.Message) {
 
-	records, err := c.recordDB.All(inputMsg.From.ID)
+	records, err := c.dataAccessObject.All(inputMsg.From.ID)
 	if err != nil {
 		log.Fatalln(err)
 	}
