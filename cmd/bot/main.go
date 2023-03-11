@@ -11,20 +11,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/sadbard/StorageBot/internal/app/commands"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
-	"github.com/sadbard/StorageBot/internal/storage"
-)
-
-var numericKeyboard = tgbotapi.NewReplyKeyboard(
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("1"),
-		tgbotapi.NewKeyboardButton("2"),
-		tgbotapi.NewKeyboardButton("3"),
-	),
-	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("4"),
-		tgbotapi.NewKeyboardButton("5"),
-		tgbotapi.NewKeyboardButton("6"),
-	),
+	"github.com/sadbard/StorageBot/internal/storage/postgres"
 )
 
 func main() {
@@ -56,7 +43,7 @@ func main() {
 	}
 	defer db.Close()
 
-	recDB := storage.NewRecordDB(db)
+	recDB := postgres.NewDataBase(db)
 	keyboardService := keyboard.NewService()
 	commander := commands.NewCommander(bot, keyboardService, recDB)
 

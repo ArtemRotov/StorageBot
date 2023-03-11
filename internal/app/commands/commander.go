@@ -1,15 +1,15 @@
 package commands
 
 import (
-	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
+	"github.com/sadbard/StorageBot/internal/storage/models"
 )
 
 type RecordInterface interface {
-	All(userId int64) ([]fmt.Stringer, error)
+	All(userId int64) ([]models.Record, error)
 	Add(userId int64, label, login, password string) error
 }
 

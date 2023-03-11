@@ -1,21 +1,22 @@
-package storage
+package postgres
 
 import (
 	"database/sql"
-	"fmt"
+
+	"github.com/sadbard/StorageBot/internal/storage/models"
 )
 
-type RecordDB struct {
+type DataBase struct {
 	DB *sql.DB
 }
 
-func NewRecordDB(db *sql.DB) *RecordDB {
-	return &RecordDB{
+func NewDataBase(db *sql.DB) *DataBase {
+	return &DataBase{
 		DB: db,
 	}
 }
 
-func (r *RecordDB) All(userId int64) ([]fmt.Stringer, error) {
+func (r *DataBase) All(userId int64) ([]models.Record, error) {
 	rows, err := r.DB.Query(
 		`
 		SELECT R.rec_id, R.rec_label, R.login, R.password
@@ -29,16 +30,16 @@ func (r *RecordDB) All(userId int64) ([]fmt.Stringer, error) {
 
 	defer rows.Close()
 
-	var records []fmt.Stringer
+	var records []models.Record
 
 	for rows.Next() {
-		var rec Record
+		var rec models.Record
 		err := rows.Scan(&rec.ID, &rec.Name, &rec.Login, &rec.Passw)
 		if err != nil {
 			return nil, err
 		}
 
-		records = append(records, &rec)
+		records = append(records, rec)
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (r *RecordDB) All(userId int64) ([]fmt.Stringer, error) {
 	return records, nil
 }
 
-func (r *RecordDB) Add(userId int64, label, login, password string) error {
+func (r *DataBase) Add(userId int64, label, login, password string) error {
 	recCount, err := r.Count(userId)
 	if err != nil {
 		return err
@@ -65,7 +66,7 @@ func (r *RecordDB) Add(userId int64, label, login, password string) error {
 	return nil
 }
 
-func (r *RecordDB) Count(userId int64) (count int, err error) {
+func (r *DataBase) Count(userId int64) (count int, err error) {
 	rows, err := r.DB.Query(
 		`
 		SELECT COUNT(R.rec_id) FROM records R
@@ -90,15 +91,4 @@ func (r *RecordDB) Count(userId int64) (count int, err error) {
 	}
 
 	return count, err
-}
-
-type Record struct {
-	ID    int
-	Name  string
-	Login string
-	Passw string
-}
-
-func (r *Record) String() string {
-	return fmt.Sprintf("%d   %s   %s   %s\n\n", r.ID, r.Name, r.Login, r.Passw)
 }
