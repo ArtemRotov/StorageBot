@@ -4,6 +4,7 @@ import (
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/sadbard/StorageBot/internal/app/client"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
 	"github.com/sadbard/StorageBot/internal/storage/models"
 )
@@ -13,15 +14,20 @@ type RecordInterface interface {
 	Add(userId int64, label, login, password string) error
 }
 
+type ClientInterface interface {
+	Send(id int64, msg string)
+	SendReplyMarkup(id int64, msg string, reply interface{})
+}
+
 type Commander struct {
-	bot              *tgbotapi.BotAPI
+	client           ClientInterface
 	keyboardService  *keyboard.Service
 	dataAccessObject RecordInterface
 }
 
-func NewCommander(bot *tgbotapi.BotAPI, keybServ *keyboard.Service, dao RecordInterface) *Commander {
+func NewCommander(cl *client.Client, keybServ *keyboard.Service, dao RecordInterface) *Commander {
 	return &Commander{
-		bot:              bot,
+		client:           cl,
 		keyboardService:  keybServ,
 		dataAccessObject: dao,
 	}

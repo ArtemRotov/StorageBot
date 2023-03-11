@@ -1,14 +1,11 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-	"log"
 	"os"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/sadbard/StorageBot/internal/app/client"
 	"github.com/sadbard/StorageBot/internal/app/commands"
 	"github.com/sadbard/StorageBot/internal/service/keyboard"
 	"github.com/sadbard/StorageBot/internal/storage/postgres"
@@ -18,36 +15,16 @@ func main() {
 	godotenv.Load()
 	token := os.Getenv("TOKEN")
 
-	bot, err := tgbotapi.NewBotAPI(token)
-	if err != nil {
-		log.Panic(err)
-	}
-	bot.Debug = false
+	tgClient := client.NewClient(token)
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	dataBase := postgres.NewDataBase()
+	defer dataBase.Close()
 
-	u := tgbotapi.UpdateConfig{
-		Timeout: 60,
-	}
-
-	dbUser := os.Getenv("DB_USER")
-	dbPassw := os.Getenv("DB_PASSW")
-	dbName := os.Getenv("DB_NAME")
-	dbSSLM := os.Getenv("BS_SSLM")
-	dataSourceName := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
-		dbUser, dbPassw, dbName, dbSSLM)
-
-	db, err := sql.Open("postgres", dataSourceName)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	recDB := postgres.NewDataBase(db)
 	keyboardService := keyboard.NewService()
-	commander := commands.NewCommander(bot, keyboardService, recDB)
 
-	updates := bot.GetUpdatesChan(u)
+	commander := commands.NewCommander(tgClient, keyboardService, dataBase)
+
+	updates := tgClient.GetUpdatesChan()
 
 	for update := range updates {
 		commander.HandleUpdate(&update)

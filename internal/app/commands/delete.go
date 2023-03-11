@@ -5,6 +5,5 @@ import (
 )
 
 func (c *Commander) Delete(inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "TBD DELETE")
-	c.bot.Send(msg)
+	c.client.Send(inputMsg.Chat.ID, "TBD DELETE")
 }

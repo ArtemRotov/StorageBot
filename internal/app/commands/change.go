@@ -5,6 +5,5 @@ import (
 )
 
 func (c *Commander) Change(inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "TBD CHANGE")
-	c.bot.Send(msg)
+	c.client.Send(inputMsg.Chat.ID, "TBD CHANGE")
 }

@@ -18,6 +18,5 @@ func (c *Commander) List(inputMsg *tgbotapi.Message) {
 		strOut.WriteString(rec.String())
 	}
 
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, strOut.String())
-	c.bot.Send(msg)
+	c.client.Send(inputMsg.Chat.ID, strOut.String())
 }

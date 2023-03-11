@@ -5,6 +5,5 @@ import (
 )
 
 func (c *Commander) Help(inputMsg *tgbotapi.Message) {
-	msg := tgbotapi.NewMessage(inputMsg.Chat.ID, "TBD HELP")
-	c.bot.Send(msg)
+	c.client.Send(inputMsg.Chat.ID, "TBD HELP")
 }

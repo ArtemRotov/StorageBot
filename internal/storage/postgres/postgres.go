@@ -2,22 +2,52 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	"github.com/sadbard/StorageBot/internal/storage/models"
 )
 
 type DataBase struct {
-	DB *sql.DB
+	DB         *sql.DB
+	dbUser     string
+	dbPassword string
+	dbName     string
+	dbSSLM     string
 }
 
-func NewDataBase(db *sql.DB) *DataBase {
-	return &DataBase{
-		DB: db,
+func openDB(user, pass, name, ssl string) *sql.DB {
+	dataSourceName := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s",
+		user, pass, name, ssl)
+
+	db, err := sql.Open("postgres", dataSourceName)
+	if err != nil {
+		panic(err)
 	}
+
+	return db
 }
 
-func (r *DataBase) All(userId int64) ([]models.Record, error) {
-	rows, err := r.DB.Query(
+func NewDataBase() *DataBase {
+	db := &DataBase{
+		DB:         nil,
+		dbUser:     os.Getenv("DB_USER"),
+		dbPassword: os.Getenv("DB_PASSW"),
+		dbName:     os.Getenv("DB_NAME"),
+		dbSSLM:     os.Getenv("BS_SSLM"),
+	}
+
+	db.DB = openDB(db.dbUser, db.dbPassword, db.dbName, db.dbSSLM)
+
+	return db
+}
+
+func (d *DataBase) Close() {
+	d.DB.Close()
+}
+
+func (d *DataBase) All(userId int64) ([]models.Record, error) {
+	rows, err := d.DB.Query(
 		`
 		SELECT R.rec_id, R.rec_label, R.login, R.password
 		FROM records R
@@ -48,13 +78,13 @@ func (r *DataBase) All(userId int64) ([]models.Record, error) {
 	return records, nil
 }
 
-func (r *DataBase) Add(userId int64, label, login, password string) error {
-	recCount, err := r.Count(userId)
+func (d *DataBase) Add(userId int64, label, login, password string) error {
+	recCount, err := d.Count(userId)
 	if err != nil {
 		return err
 	}
 
-	_, err = r.DB.Exec(
+	_, err = d.DB.Exec(
 		`
 		INSERT INTO records VALUES 
 		($1, $2, $3, $4, $5);
@@ -66,8 +96,8 @@ func (r *DataBase) Add(userId int64, label, login, password string) error {
 	return nil
 }
 
-func (r *DataBase) Count(userId int64) (count int, err error) {
-	rows, err := r.DB.Query(
+func (d *DataBase) Count(userId int64) (count int, err error) {
+	rows, err := d.DB.Query(
 		`
 		SELECT COUNT(R.rec_id) FROM records R
 		WHERE R.user_id = $1
