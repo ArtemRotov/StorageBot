@@ -1,7 +1,7 @@
-.PHONE: run
+.PHONY: run
 run:
 	go run cmd/bot/main.go
 
-.PHONE: build
+.PHONY: build
 build:
 	go build -o bot cmd/bot/main.go
